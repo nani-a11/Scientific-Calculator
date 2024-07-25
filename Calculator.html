@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scientific Calculator</title>
+<style>
+@import url('https://fonts.googleapis.com/css?family=Montserrat&display=swap');
+
+body {
+  background: #353535;
+  font-family: 'Montserrat', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.calculator {
+  background: #dde1e7;
+  width: 360px;
+  height: 600px;
+  border-radius: .5em;
+  box-shadow: -3px -3px 7px #ffffff73, 2px 2px 5px rgba(94, 104, 121, 0.288);
+  padding: 32px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+#display {
+  width: 100%;
+  height: 80px;
+  box-shadow: inset 2px 2px 5px #babecc, inset -5px -5px 10px #ffffff73;
+  background-color: #dde1e7;
+  color: #333;
+  border: none;
+  font-size: 30pt;
+  overflow-y: auto;
+  text-align: right;
+  padding-right: 10px;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+}
+
+.buttons {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-gap: 1em;
+}
+
+.button, .num-button {
+  cursor: pointer;
+  text-align: center;
+  width: 50px;
+  font-size: 16px;
+  height: 50px;
+  display: grid;
+  place-content: center;
+  border-radius: 50%;
+  box-shadow: 2px 2px 5px #babecc, -5px -5px 10px #ffffff73;
+  background-color: #dde1e7;
+  color: #333;
+  border: none;
+  outline: none;
+}
+
+.button:hover, .num-button:hover {
+  color: #3498db;
+}
+
+</style>
+</head>
+<body>
+    <div class="calculator">
+        <input type="text" id="display" readonly>
+        <div class="buttons">
+            <!-- Button rows will be inserted here -->
+        </div>
+    </div>
+    <script>
+const buttonList = [
+    "C", "CE", "(", ")", "÷",
+    "7", "8", "9", "*", "√",
+    "4", "5", "6", "-", "π",
+    "1", "2", "3", "+", "e",
+    "0", ".", "=", "%", "xʸ",
+    "x²", "x³", "∛", "x!", "log10",
+    "ln", "deg", "rad", "sinθ", "cosθ",
+    "tanθ", "sinh", "cosh", "tanh", "2π"
+];
+
+const buttonsContainer = document.querySelector('.buttons');
+const display = document.getElementById('display');
+
+buttonList.forEach(text => {
+    const button = document.createElement('button');
+    button.innerText = text;
+    button.className = 'button';
+    button.addEventListener('click', () => onButtonClick(text));
+    buttonsContainer.appendChild(button);
+});
+
+document.addEventListener('keydown', (event) => {
+    const key = event.key;
+    const specialKeys = {
+        'Enter': '=',
+        'Backspace': 'C',
+        'Delete': 'CE',
+        '/': '÷',
+        '*': '*',
+        '-': '-',
+        '+': '+',
+        '.': '.',
+        '(': '(',
+        ')': ')',
+        '%': '%'
+    };
+
+    if (key in specialKeys) {
+        onButtonClick(specialKeys[key]);
+    } else if (/\d/.test(key)) {
+        onButtonClick(key);
+    }
+});
+
+function onButtonClick(val) {
+    let e = display.value;
+    let ans = '';
+
+    try {
+        if (val === 'C') {
+            display.value = e.slice(0, -1);
+            return;
+        } else if (val === 'CE') {
+            display.value = '';
+            return;
+        } else if (val === '√') {
+            ans = Math.sqrt(eval(e));
+        } else if (val === 'π') {
+            ans = Math.PI;
+        } else if (val === 'cosθ') {
+            ans = Math.cos(toRadians(eval(e)));
+        } else if (val === 'sinθ') {
+            ans = Math.sin(toRadians(eval(e)));
+        } else if (val === 'tanθ') {
+            ans = Math.tan(toRadians(eval(e)));
+        } else if (val === '2π') {
+            ans = 2 * Math.PI;
+        } else if (val === 'cosh') {
+            ans = Math.cosh(eval(e));
+        } else if (val === 'sinh') {
+            ans = Math.sinh(eval(e));
+        } else if (val === 'tanh') {
+            ans = Math.tanh(eval(e));
+        } else if (val === '∛') {
+            ans = Math.cbrt(eval(e));
+        } else if (val === 'xʸ') {
+            display.value += '**';
+            return;
+        } else if (val === 'x³') {
+            ans = Math.pow(eval(e), 3);
+        } else if (val === 'x²') {
+            ans = Math.pow(eval(e), 2);
+        } else if (val === 'ln') {
+            ans = Math.log2(eval(e));
+        } else if (val === 'deg') {
+            ans = toDegrees(eval(e));
+        } else if (val === 'rad') {
+            ans = toRadians(eval(e));
+        } else if (val === 'e') {
+            ans = Math.E;
+        } else if (val === 'log10') {
+            ans = Math.log10(eval(e));
+        } else if (val === 'x!') {
+            ans = factorial(eval(e));
+        } else if (val === '÷') {
+            display.value += '/';
+            return;
+        } else if (val === '=') {
+            ans = eval(e);
+        } else {
+            display.value += val;
+            return;
+        }
+        display.value = ans;
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+function toRadians(deg) {
+    return deg * (Math.PI / 180);
+}
+
+function toDegrees(rad) {
+    return rad * (180 / Math.PI);
+}
+
+function factorial(n) {
+    if (n === 0) {
+        return 1;
+    } else {
+        return n * factorial(n - 1);
+    }
+}
+1
+    </script>
+</body>
+</html>
